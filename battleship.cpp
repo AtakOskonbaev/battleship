@@ -25,11 +25,11 @@ int main()
     srand(time(NULL));
 
     Player leaderboard[5];
-    leaderboard[0] = {" " , 0};
-    leaderboard[1] = {" " , 0};
-    leaderboard[2] = {" " , 0};
-    leaderboard[3] = {" " , 0};
-    leaderboard[4] = {" " , 0};
+    leaderboard[0] = {" ", 0};
+    leaderboard[1] = {" ", 0};
+    leaderboard[2] = {" ", 0};
+    leaderboard[3] = {" ", 0};
+    leaderboard[4] = {" ", 0};
     char board[BS][BS];
     char playerBoard[BS][BS];
     int row, col, counter = 0;
@@ -206,7 +206,9 @@ void placeShips(char board[][BS])
             } while (col > 5 ||
                      board[row][col] != ' ' ||
                      board[row][col + 1] != ' ' ||
-                     board[row][col - 1] != ' ');
+                     board[row][col - 1] != ' ' ||
+                     board[row + 1][col] != ' ' ||
+                     board[row - 1][col] != ' ');
 
             board[row][col] = 'S';
             board[row][col + 1] = 'S';
@@ -222,7 +224,8 @@ void placeShips(char board[][BS])
                      board[row][col] != ' ' ||
                      board[row][col + 1] != ' ' ||
                      board[row][col - 1] != ' ' ||
-                     board[row][col + 2] != ' ');
+                     board[row + 1][col] != ' ' ||
+                     board[row - 1][col] != ' ');
 
             board[row][col] = 'S';
             board[row + 1][col] = 'S';
