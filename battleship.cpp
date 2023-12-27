@@ -1,9 +1,8 @@
 #include <iostream>
 #include <string>
-#include <algorithm>
 using namespace std;
 
-const int BS = 7; // Board Size
+const int BS = 8; // Board Size
 
 struct Player
 {
@@ -11,13 +10,12 @@ struct Player
     int shots;
 };
 
-void printBoard(const char board[][BS]);
+void printBoard(const char playerBoard[][BS]);
 bool isValidMove(int row, int col, const char board[][BS]);
-bool isShipHit(int row, int col, const char board[][BS], int &hits);
-bool isShipSunk(int hits, int length);
+bool isShipHit(int row, int col, const char board[][BS], char playerBoard[][BS]);
 bool isGameOver(const char board[][BS]);
-void placeShips(char board[][BS]);
-void updateBoard(int row, int col, char board[][BS], int &hits);
+void placeShips(char board[][BS], char playerBoard[][BS]);
+void updateBoard(int row, int col, char board[][BS], char playerBoard[][BS]);
 void displayResults(const char board[][BS], int shots, const Player leaderboard[]);
 
 int main()
@@ -33,7 +31,6 @@ int main()
     char board[BS][BS];
     char playerBoard[BS][BS];
     int row, col, counter = 0;
-    ;
 
     do
     {
@@ -41,12 +38,12 @@ int main()
         cout << "Enter your name: ";
         cin >> playerName;
         cout << "Hello " << playerName << "!" << endl;
-        placeShips(board);
+        placeShips(board, playerBoard);
         int shots = 0;
 
         do
         {
-            printBoard(board);
+            printBoard(playerBoard);
 
             cout << playerName << ", enter your guess (row col): ";
             cin >> row >> col;
@@ -56,7 +53,7 @@ int main()
 
             if (isValidMove(row, col, board))
             {
-                updateBoard(row, col, board, shots);
+                updateBoard(row, col, board, playerBoard);
                 shots++;
 
                 if (isGameOver(board))
@@ -66,11 +63,6 @@ int main()
                     break;
                 }
             }
-            else
-            {
-                cout << "Invalid move. Try again." << endl;
-            }
-
         } while (true);
 
         char playAgain;
@@ -78,28 +70,22 @@ int main()
         cin >> playAgain;
 
         if (playAgain != 'y' && playAgain != 'Y')
-        {
             break;
-        }
         counter++;
     } while (true);
     cout << "Leaderboard: " << endl;
     for (int i = 0; i < 10; i++)
-    {
         cout << leaderboard[i].playerName << ": " << leaderboard[i].shots << endl;
-    }
 }
 
-void printBoard(const char board[][BS])
+void printBoard(const char playerBoard[][BS])
 {
-    cout << "  1 2 3 4 5 6 7" << endl;
+    cout << "  1 2 3 4 5 6 7 8" << endl;
     for (int i = 0; i < BS; i++)
     {
         cout << i + 1 << " ";
         for (int j = 0; j < BS; j++)
-        {
-            cout << board[i][j] << " ";
-        }
+            cout << playerBoard[i][j] << " ";
         cout << endl;
     }
 }
@@ -120,7 +106,7 @@ bool isValidMove(int row, int col, const char board[][BS])
     return true;
 }
 
-bool isShipHit(int row, int col, const char board[][BS], int &hits)
+bool isShipHit(int row, int col, const char board[][BS], char playerBoard[][BS])
 {
     if (board[row][col] == 'S')
     {
@@ -132,36 +118,24 @@ bool isShipHit(int row, int col, const char board[][BS], int &hits)
     return false;
 }
 
-bool isShipSunk(int hits, int length)
-{
-    return hits == length;
-}
-
 bool isGameOver(const char board[][BS])
 {
     for (int i = 0; i < BS; ++i)
-    {
         for (int j = 0; j < BS; ++j)
-        {
             if (board[i][j] == 'S')
-            {
                 return false;
-            }
-        }
-    }
 
     return true;
 }
 
-void placeShips(char board[][BS])
+void placeShips(char board[][BS], char playerBoard[][BS])
 {
     for (int i = 0; i < BS; ++i)
-    {
         for (int j = 0; j < BS; ++j)
         {
+            playerBoard[i][j] = ' ';
             board[i][j] = ' ';
         }
-    }
 
     for (int i = 0; i < 1; ++i)
     {
@@ -173,7 +147,7 @@ void placeShips(char board[][BS])
             {
                 row = rand() % BS;
                 col = rand() % BS;
-            } while (row > 4);
+            } while (row > 5);
 
             board[row][col] = 'S';
             board[row + 1][col] = 'S';
@@ -185,7 +159,7 @@ void placeShips(char board[][BS])
             {
                 row = rand() % BS;
                 col = rand() % BS;
-            } while (col > 4);
+            } while (col > 5);
 
             board[row][col] = 'S';
             board[row][col + 1] = 'S';
@@ -203,12 +177,19 @@ void placeShips(char board[][BS])
             {
                 row = rand() % BS;
                 col = rand() % BS;
-            } while (col > 5 ||
+            } while (col > 6 ||
                      board[row][col] != ' ' ||
                      board[row][col + 1] != ' ' ||
                      board[row][col - 1] != ' ' ||
+                     board[row][col + 2] != ' ' ||
                      board[row + 1][col] != ' ' ||
-                     board[row - 1][col] != ' ');
+                     board[row + 1][col + 1] != ' ' ||
+                     board[row + 1][col - 1] != ' ' ||
+                     board[row + 1][col + 2] != ' ' ||
+                     board[row - 1][col] != ' ' ||
+                     board[row - 1][col + 1] != ' ' ||
+                     board[row - 1][col + 2] != ' ' ||
+                     board[row - 1][col - 1] != ' ');
 
             board[row][col] = 'S';
             board[row][col + 1] = 'S';
@@ -220,12 +201,19 @@ void placeShips(char board[][BS])
             {
                 row = rand() % BS;
                 col = rand() % BS;
-            } while (row > 5 ||
+            } while (row > 6 ||
                      board[row][col] != ' ' ||
                      board[row][col + 1] != ' ' ||
                      board[row][col - 1] != ' ' ||
                      board[row + 1][col] != ' ' ||
-                     board[row - 1][col] != ' ');
+                     board[row + 1][col + 1] != ' ' ||
+                     board[row + 1][col - 1] != ' ' ||
+                     board[row - 1][col] != ' ' ||
+                     board[row - 1][col + 1] != ' ' ||
+                     board[row - 1][col - 1] != ' ' ||
+                     board[row - 2][col] != ' ' ||
+                     board[row - 2][col + 1] != ' ' ||
+                     board[row - 2][col - 1] != ' ');
 
             board[row][col] = 'S';
             board[row + 1][col] = 'S';
@@ -244,21 +232,25 @@ void placeShips(char board[][BS])
                  board[row][col - 1] != ' ' ||
                  board[row + 1][col] != ' ' ||
                  board[row + 1][col + 1] != ' ' ||
+                 board[row + 1][col - 1] != ' ' ||
                  board[row - 1][col] != ' ' ||
+                 board[row - 1][col - 1] != ' ' ||
                  board[row - 1][col + 1] != ' ');
 
         board[row][col] = 'S';
     }
 }
 
-void updateBoard(int row, int col, char board[][BS], int &hits)
+void updateBoard(int row, int col, char board[][BS], char playerBoard[][BS])
 {
-    if (isShipHit(row, col, board, hits))
+    if (isShipHit(row, col, board, playerBoard))
     {
+        playerBoard[row][col] = 'X';
         board[row][col] = 'X';
     }
     else
     {
+        playerBoard[row][col] = 'O';
         board[row][col] = 'O';
     }
 }
